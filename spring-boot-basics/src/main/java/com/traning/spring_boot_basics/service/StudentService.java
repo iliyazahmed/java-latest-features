@@ -39,51 +39,37 @@ public class StudentService {
 	}
 
 	public StandardResponse getStudentData(Integer rollNo) {
-		GetStudentDataResponse dataResponse = new GetStudentDataResponse();
-		StandardResponse standardResponse = new StandardResponse();
 		List<String> subjectList = Arrays.asList("Telugu", "Hindi", "English");
 
-		Student student2_0 = new Student();
-		student2_0.setStudentName("Sagar");
-		student2_0.setRollNo(10);
-		student2_0.setSubjects(subjectList);
-		student2_0.setCourseFee(10.00);
+		studentInfo.add(new Student("Sagar", 10, subjectList, 10.00));
+		studentInfo.add(new Student("Krishna", 12, subjectList, 10.00));
+		studentInfo.add(new Student("Prasad", 13, subjectList, 10.00));
 
-		Student student3_0 = new Student();
-		student3_0.setStudentName("Krishna");
-		student3_0.setRollNo(12);
-		student3_0.setSubjects(subjectList);
-		student3_0.setCourseFee(10.00);
+		
+		Student matchedStudent = studentInfo.stream()
+				.filter(student -> student.getRollNo().equals(rollNo))
+				.findFirst()
+				.orElse(null);
 
-		Student student4_0 = new Student();
-		student4_0.setStudentName("Prasad");
-		student4_0.setRollNo(13);
-		student4_0.setSubjects(subjectList);
-		student4_0.setCourseFee(10.00);
+		StandardResponse standardResponse = new StandardResponse();
 
-		studentInfo.add(student2_0);
-		studentInfo.add(student3_0);
-		studentInfo.add(student4_0);
+		if (matchedStudent != null) {
+			GetStudentDataResponse dataResponse = new GetStudentDataResponse();
+			dataResponse.setStudentName(matchedStudent.getStudentName());
+			dataResponse.setSubjects(matchedStudent.getSubjects());
+			dataResponse.setCourseFees(matchedStudent.getCourseFee());
 
-		for (Student list : studentInfo) {
-			if (list.getRollNo().equals(rollNo)) {
-				dataResponse.setStudentName("Prasad");
-				dataResponse.setSubjects(subjectList);
-				dataResponse.setCourseFees(10.00);
-			}
-		}
-
-		if (dataResponse.getSubjects() != null) {
-			standardResponse.setResponseDescription("Successfully Retrived");
+			standardResponse.setResponseDescription("Successfully Retrieved");
 			standardResponse.setStatus(true);
 			standardResponse.setStatusCode(200);
 			standardResponse.setGetStudentDataResponse(dataResponse);
-			return standardResponse;
 		} else {
-			standardResponse.setResponseDescription("Not Found ");
+			standardResponse.setResponseDescription("Not Found");
 			standardResponse.setStatus(false);
 			standardResponse.setStatusCode(400);
-			return standardResponse;
 		}
+
+		return standardResponse;
+
 	}
 }
