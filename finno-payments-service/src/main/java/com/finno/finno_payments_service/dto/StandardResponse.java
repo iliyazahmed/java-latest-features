@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class StandardResponse {
 	private Integer statusCode;
-	private Boolean status;
+	private boolean status;
 	private String responseDescription;
 	private String transactionId;
 }
