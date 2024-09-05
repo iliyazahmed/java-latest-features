@@ -10,7 +10,6 @@ import lombok.Data;
 @Data
 public class PaymentDTO {
 	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String transaction_id;
 	private String username;
 	private String email;

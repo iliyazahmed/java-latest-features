@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import com.finno.finno_payments_service.entity.PaymentDTO;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<PaymentDTO, Integer> {
+public interface PaymentRepository extends JpaRepository<PaymentDTO, String> {
+
+	public PaymentDTO findByEmail(String email);
 
 }
