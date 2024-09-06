@@ -1,13 +1,18 @@
 package com.finno.finno_payments_service.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.finno.finno_payments_service.controller.PaymentController;
 import com.finno.finno_payments_service.dto.FindByEmailResponse;
 import com.finno.finno_payments_service.dto.GetTransactionDetailsResponse;
 import com.finno.finno_payments_service.dto.PaymentRequest;
@@ -19,7 +24,7 @@ import com.finno.finno_payments_service.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
-
+	private Logger logger = LoggerFactory.getLogger(PaymentService.class);
 	@Autowired
 	private PaymentRepository paymentRepository;
 
@@ -39,10 +44,12 @@ public class PaymentService {
 			response.setStatus(true);
 			response.setStatusCode(201);
 			response.setTransactionId(saveTrnsResponse.getTransaction_id());
+			logger.info("success save api");
 		} else {
 			response.setResponseDescription("Unable save Transaction ");
 			response.setStatus(false);
 			response.setStatusCode(500);
+			logger.error("Save api call  failed internal exception ");
 		}
 		return response;
 	}
@@ -100,31 +107,55 @@ public class PaymentService {
 			standardResponse.setStatus(false);
 			standardResponse.setResponseDescription(e.getMessage());
 			standardResponse.setStatusCode(500);
+			logger.error("Exception occured while updating customer details " + e.getMessage());
 		}
 
 		return standardResponse;
 	}
 
-	public StandardResponseByEmail getByEmail(String emailId) {
+//	public StandardResponseByEmail getByEmail(String emailId) {
+//		StandardResponseByEmail response = new StandardResponseByEmail();
+//		FindByEmailResponse emailResponse = new FindByEmailResponse();
+//		PaymentDTO paymentResponse = paymentRepository.findByEmail(emailId);
+//		if (paymentResponse != null) {
+//			emailResponse.setTransactionId(paymentResponse.getTransaction_id());
+//			emailResponse.setUsername(paymentResponse.getUsername());
+//			emailResponse.setEmailId(paymentResponse.getEmail());
+//			emailResponse.setAmount(paymentResponse.getAmount());
+//			emailResponse.setPaymentType(paymentResponse.getPayment_type());
+//			emailResponse.setDate(paymentResponse.getDate());
+//			response.setResponse(emailResponse);
+//			response.setStatus(true);
+//			response.setResponseDescription("Successfully Able to retireve data");
+//			response.setStatusCode(200);
+//		} else {
+//			response.setStatus(false);
+//			response.setResponseDescription("NOT_FOUND");
+//			response.setStatusCode(404);
+//		}
+//		return response;
+//	}
+
+	public StandardResponseByEmail getByPaymentType(String paymentType) {
 		StandardResponseByEmail response = new StandardResponseByEmail();
-		FindByEmailResponse emailResponse = new FindByEmailResponse();
-		PaymentDTO paymentResponse = paymentRepository.findByEmail(emailId);
-		if (paymentResponse != null) {
-			emailResponse.setTransactionId(paymentResponse.getTransaction_id());
-			emailResponse.setUsername(paymentResponse.getUsername());
-			emailResponse.setEmailId(paymentResponse.getEmail());
-			emailResponse.setAmount(paymentResponse.getAmount());
-			emailResponse.setPaymentType(paymentResponse.getPayment_type());
-			emailResponse.setDate(paymentResponse.getDate());
-			response.setResponse(emailResponse);
-			response.setStatus(true);
-			response.setResponseDescription("Successfully Able to retireve data");
-			response.setStatusCode(200);
-		} else {
-			response.setStatus(false);
-			response.setResponseDescription("NOT_FOUND");
-			response.setStatusCode(404);
+		List<PaymentDTO> findByPaymentType = paymentRepository.findByPaymentType(paymentType);
+		System.out.println(findByPaymentType);
+		List<FindByEmailResponse> paymentRes = new ArrayList<>();
+		for (PaymentDTO pay : findByPaymentType) {
+			FindByEmailResponse emailResponse = new FindByEmailResponse();
+			emailResponse.setTransactionId(pay.getTransaction_id());
+			emailResponse.setUsername(pay.getUsername());
+			emailResponse.setEmailId(pay.getEmail());
+			emailResponse.setAmount(pay.getAmount());
+			emailResponse.setPaymentType(pay.getPayment_type());
+			emailResponse.setDate(pay.getDate());
+			paymentRes.add(emailResponse);
 		}
+
+		response.setResponse(paymentRes);
+		response.setStatus(true);
+		response.setResponseDescription("Successfully Able to retireve data");
+		response.setStatusCode(200);
 		return response;
 	}
 
